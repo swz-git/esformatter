@@ -3,14 +3,24 @@
   esbuild.initialize({
     wasmURL: "https://unpkg.com/esbuild-wasm/esbuild.wasm",
   });
+  let error = false;
   async function format() {
     let input = document.getElementById("input").value;
-    let result = await esbuild.transform(input, {
-      minifyWhitespace: document.getElementById("whitespace").checked,
-      minifyIdentifiers: document.getElementById("identifiers").checked,
-      minifySyntax: document.getElementById("syntax").checked,
-    });
-    document.getElementById("output").innerHTML = result.code;
+    esbuild
+      .transform(input, {
+        minifyWhitespace: document.getElementById("whitespace").checked,
+        minifyIdentifiers: document.getElementById("identifiers").checked,
+        minifySyntax: document.getElementById("syntax").checked,
+      })
+      .then((result) => {
+        error = false;
+        document.getElementById("output").innerHTML = result.code;
+        // console.log(result.code);
+      })
+      .catch((e) => {
+        // console.log(e);
+        error = true;
+      });
   }
 </script>
 
@@ -19,10 +29,19 @@
     <h1>esformatter</h1>
   </header>
   <div class="splitter">
-    <textarea name="input" id="input" on:keyup={format} />
-    <textarea name="output" id="output" disabled />
+    <div class="codewrapper">
+      <textarea name="input" id="input" on:keyup={format} />
+    </div>
+    <div class="codewrapper">
+      <textarea
+        name="output"
+        id="output"
+        class={error ? "error" : "noerror"}
+        disabled
+      />
+    </div>
   </div>
-  <footer>
+  <div class="options">
     <div class="checkwrapper">
       <input type="checkbox" id="whitespace" on:change={format} />
       <p>Minify whitespace</p>
@@ -35,7 +54,7 @@
       <input type="checkbox" id="syntax" on:change={format} />
       <p>Minify syntax</p>
     </div>
-  </footer>
+  </div>
 </main>
 
 <style>
@@ -68,26 +87,27 @@
     width: 100%;
     gap: 0.5rem;
   }
+  .codewrapper {
+    flex: 1;
+    display: flex;
+  }
   textarea {
     background-color: white;
     resize: none;
     flex: 1;
   }
-  footer {
+  .options {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 1rem;
   }
   .checkwrapper {
     display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
-  button {
-    font-size: 1.3rem;
-    margin: 0.2rem;
-    padding: 0.2rem 0.4rem;
-    border: none;
-    background-color: #0077ff;
-  }
-  button:active {
-    background-color: #0044ff;
+
+  .error {
+    color: red;
   }
 </style>
