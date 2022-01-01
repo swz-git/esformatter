@@ -1,7 +1,7 @@
 <script>
   import esbuild from "esbuild-wasm";
   esbuild.initialize({
-    wasmURL: "https://unpkg.com/esbuild-wasm/esbuild.wasm",
+    wasmURL: "https://unpkg.com/esbuild-wasm@0.14.7/esbuild.wasm",
   });
   let error = false;
   async function format() {
